@@ -1,13 +1,42 @@
 export interface DbItem {
-  // sketch out interface here
+  title: string;
+  description: string;
+  completed: boolean;
 }
 
 export interface DbItemWithId extends DbItem {
   id: number;
 }
 
-const db: DbItemWithId[] = [];
+const verbs: string[] = [
+  "feed",
+  "water",
+  "finish",
+  "walk",
+  "organise",
+  "plan",
+  "read",
+  "fly",
+  "phone",
+  "attend",
+  "watch",
+  "clean",
+  "do",
+];
+const nouns: string[] = [
+  "fish",
+  "dog",
+  "diary",
+  "article",
+  "meeting",
+  "friends",
+  "parents",
+  "Big-Foot",
+  "office",
+  "Game of Thrones",
+];
 
+const db: DbItemWithId[] = [];
 /** Variable to keep incrementing id of database items */
 let idCounter = 0;
 
@@ -18,14 +47,18 @@ let idCounter = 0;
  * @returns the created items
  */
 export const addDummyDbItems = (n: number): DbItemWithId[] => {
-  const createdSignatures: DbItemWithId[] = [];
+  const createdTodos: DbItemWithId[] = [];
   for (let count = 0; count < n; count++) {
-    const createdSignature = addDbItem({
-      // possibly add some generated data here
+    const verbIndex: number = Math.floor(Math.random() * verbs.length);
+    const nounIndex: number = Math.floor(Math.random() * nouns.length);
+    const createdTodo = addDbItem({
+      title: nouns[nounIndex] + "-" + verbs[verbIndex] + "ing",
+      description: verbs[verbIndex] + " " + nouns[nounIndex],
+      completed: false,
     });
-    createdSignatures.push(createdSignature);
+    createdTodos.push(createdTodo);
   }
-  return createdSignatures;
+  return createdTodos;
 };
 
 /**
