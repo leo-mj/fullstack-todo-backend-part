@@ -24,10 +24,7 @@ app.use(cors());
 
 // read in contents of any environment variables in the .env file
 dotenv.config();
-const baseUrl =
-  process.env.NODE_ENV === "production" ? "to-do-lm-app.herokuapp.com" : 5000;
-
-const PORT_NUMBER = baseUrl;
+const PORT_NUMBER = process.env.PORT ?? 4000;
 // API info page
 app.get("/", (req, res) => {
   const pathToFile = filePath("../public/index.html");
