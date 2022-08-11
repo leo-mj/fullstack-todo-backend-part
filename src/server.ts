@@ -70,12 +70,13 @@ app.delete<{ id: string }>("/to-dos/:id", (req, res) => {
 
 // PATCH to-dos/:id
 app.patch<{ id: string }, {}, Partial<DbItem>>("to-dos/:id", (req, res) => {
-  const matchingToDo = updateDbItemById(parseInt(req.params.id), req.body);
+  const matchingToDo = getDbItemById(parseInt(req.params.id));
   if (matchingToDo === "not found") {
     res.status(404).json(matchingToDo);
   } else {
     res.status(200).json(matchingToDo);
   }
+  updateDbItemById(parseInt(req.params.id), req.body);
 });
 
 app.listen(PORT_NUMBER, () => {
