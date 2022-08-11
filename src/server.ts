@@ -69,7 +69,7 @@ app.delete<{ id: string }>("/to-dos/:id", (req, res) => {
 });
 
 // PATCH to-dos/:id
-app.patch<{ id: string }, {}, Partial<DbItem>>("to-dos/:id", (req, res) => {
+app.put<{ id: string }, {}, Partial<DbItem>>("to-dos/:id", (req, res) => {
   const matchingToDo = updateDbItemById(parseInt(req.params.id), req.body);
   if (matchingToDo === "not found") {
     res.status(404).json(matchingToDo);
