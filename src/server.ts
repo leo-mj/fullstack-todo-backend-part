@@ -8,7 +8,7 @@ import {
   getDbItemById,
   DbItem,
   updateDbItemById,
-  deleteDbItemById
+  deleteDbItemById,
 } from "./db";
 import filePath from "./filePath";
 
