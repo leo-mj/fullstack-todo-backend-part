@@ -7,4 +7,3 @@ export interface DbItem {
 export interface DbItemWithId extends DbItem {
   id: number;
 }
-

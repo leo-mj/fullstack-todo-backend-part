@@ -1,18 +1,15 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import {
-  DbItem
-} from "./db";
+import { DbItem } from "./db";
 import filePath from "./filePath";
-import pg, {Client} from "pg";
+import { Client } from "pg";
 
 const app = express();
 /** Parses JSON data in a request automatically */
 app.use(express.json());
 /** To allow 'Cross-Origin Resource Sharing': https://en.wikipedia.org/wiki/Cross-origin_resource_sharing */
 app.use(cors());
-
 
 // read in contents of any environment variables in the .env file
 dotenv.config();
@@ -43,26 +40,33 @@ app.get("/todos", async (req, res) => {
 
 // POST to-dos
 app.post<{}, {}, DbItem>("/todos", async (req, res) => {
-  if (typeof(req.body.title) !== 'string' || typeof(req.body.description) !== 'string') {
+  if (
+    typeof req.body.title !== "string" ||
+    typeof req.body.description !== "string"
+  ) {
     res.status(400).json({
       status: "fail",
-      data: "String values are required for both title and description in your JSON body"
-    })
+      data: "String values are required for both title and description in your JSON body",
+    });
   } else {
     const client = new Client({
-    connectionString: process.env.DATABASE_URL,
-    ssl: {
-      rejectUnauthorized: false,
-    },
-  });
+      connectionString: process.env.DATABASE_URL,
+      ssl: {
+        rejectUnauthorized: false,
+      },
+    });
     await client.connect();
-    const queryText = "INSERT INTO todos (title, description, completed) VALUES ($1, $2, $3) RETURNING *";
-    const values: (string|boolean)[] = [req.body.title, req.body.description, false];
+    const queryText =
+      "INSERT INTO todos (title, description, completed) VALUES ($1, $2, $3) RETURNING *";
+    const values: (string | boolean)[] = [
+      req.body.title,
+      req.body.description,
+      false,
+    ];
     const postedToDo = await client.query(queryText, values);
     res.status(201).json(postedToDo.rows);
     await client.end();
   }
-  
 });
 
 // GET to-dos/:id
@@ -109,7 +113,7 @@ app.delete<{ id: string }>("/todos/:id", async (req, res) => {
   } else {
     res.status(404).json({
       status: "fail",
-      data: "Could not find a to-do with that id"
+      data: "Could not find a to-do with that id",
     });
   }
   await client.end();
@@ -128,9 +132,10 @@ app.put<{ id: string }, {}, Partial<DbItem>>("/todos/:id", async (req, res) => {
   const searchQueryText = "SELECT * FROM todos WHERE id = $1";
   const toDoToUpdate = await client.query(searchQueryText, [id]);
   if (toDoToUpdate.rowCount === 1) {
-    const previousToDoValues = toDoToUpdate.rows[0]
+    const previousToDoValues = toDoToUpdate.rows[0];
     const values = [...updateValues(req.body, previousToDoValues), id];
-    const queryText = "UPDATE todos SET title = $1, description = $2, completed = $3 WHERE id = $4 RETURNING *";
+    const queryText =
+      "UPDATE todos SET title = $1, description = $2, completed = $3 WHERE id = $4 RETURNING *";
     const updatedToDo = await client.query(queryText, values);
     res.status(404).json({
       status: "success",
@@ -139,18 +144,21 @@ app.put<{ id: string }, {}, Partial<DbItem>>("/todos/:id", async (req, res) => {
   } else {
     res.status(404).json({
       status: "fail",
-      data: "Could not find a to-do with that id"
+      data: "Could not find a to-do with that id",
     });
   }
   await client.end();
 });
 
-
-function updateValues(requestBody: Partial<DbItem>, previousToDoValues: DbItem): (string|boolean)[] {
+function updateValues(
+  requestBody: Partial<DbItem>,
+  previousToDoValues: DbItem
+): (string | boolean)[] {
   const updatedTitle: string = requestBody.title || previousToDoValues.title;
-  const updatedDescription: string = requestBody.description || previousToDoValues.description;
+  const updatedDescription: string =
+    requestBody.description || previousToDoValues.description;
   let updatedCompletion: boolean = previousToDoValues.completed;
-  if ((requestBody.completed === true) || (requestBody.completed === false)) {
+  if (requestBody.completed === true || requestBody.completed === false) {
     updatedCompletion = requestBody.completed;
   }
   return [updatedTitle, updatedDescription, updatedCompletion];
